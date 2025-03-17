@@ -53,7 +53,7 @@ void error(const char *message) {
 /*================================================
  *            LEXICAL ANALYSIS
  *===============================================*/
-static void skip_whitespace() {
+static void skip_whitespace() {       //parcourt la chaîne de caractère en sautant les space
   while (input[pos] && isspace(input[pos])) {
     pos++;
   }
@@ -63,13 +63,13 @@ static Token get_next_token() {
   skip_whitespace();
   char current = input[pos];
 
-  if (current == '\0') {
+  if (current == '\0') {  //End of line
     return (Token){TOKEN_EOF, 0};
   }
-  if (isdigit(current)) {
+  if (isdigit(current)) { //check si c'est un chiffre
     int value = 0;
     while (isdigit(input[pos])) {
-      value = value * 10 + (input[pos] - '0');
+      value = value * 10 + (input[pos] - '0');  // traduit le nb en base 10
       pos++;
     }
     return (Token){TOKEN_NUMBER, value};
