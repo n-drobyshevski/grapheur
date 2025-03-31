@@ -17,7 +17,7 @@ ABS,SIN,SQRT,LOG,COS,TAN,EXP,ENTIER,VAL_NEG,SINC
 
 typedef enum
 {
-erreur100,erreur200,erreur300,erreur400
+erreur100,erreur101,erreur200,erreur300,erreur400
 }typeerreur;
 
 typedef union
@@ -41,4 +41,4 @@ typedef struct Node
     struct Node *pjeton_suiv;
 }Node;
 typedef Node *Arbre;
-#endif
+#endif 

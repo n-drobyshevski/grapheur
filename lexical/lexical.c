@@ -43,7 +43,16 @@ void AfficherLexemes(typejeton T[]) {
                 printf("PAR_FERM ())\n");
                 break;
             case ERREUR:
-                printf("ERREUR (Code %d)\n", T[i].valeur.erreur);
+                printf("ERREUR ");
+                switch (T[i].valeur.erreur) {
+                    case 0:
+                    printf("Caractere inconnu\n");
+                    break;
+
+                    case 1:
+                    printf("Fonction inconnue\n");
+                    break;
+                }
                 break;
             default:
                 printf("Autre\n");
@@ -57,7 +66,7 @@ void AnalyseLex(typejeton T[], char str[]) {
     int i = 0, j = 0;
     
     while (str[i] != '\0') {
-        if (isspace(str[i])) { // Ignore les espaces
+        if (isspace(str[i])) { 
             i++;
             continue;
         }
@@ -97,32 +106,38 @@ void AnalyseLex(typejeton T[], char str[]) {
                 if (isdigit(str[i]) || str[i] == '.') { 
                     T[j].lexem = REEL;
                     T[j].valeur.reel = strtof(&str[i], NULL);
-                    while (isdigit(str[i]) || str[i] == '.') i++; // Ignore le nombre déjà traité
+                    while (isdigit(str[i]) || str[i] == '.') i++; 
                     j++;
                     continue;
                 }
                 if (isalpha(str[i])) {
                     char buffer[10];
                     int k = 0;
-                    while (isalpha(str[i]) && k < 9) { // Récupère le mot
+                    while (isalpha(str[i]) && k < 9) { 
                         buffer[k++] = str[i++];
                     }
                     buffer[k] = '\0';
                     
-                    if ((strcmp(buffer, "SIN")) == 0|(strcmp(buffer, "sin"))== 0)
+                    if ((strcmp(buffer, "SIN")) == 0|(strcmp(buffer, "sin"))== 0){
+                        T[j].lexem = FONCTION;
                         T[j].valeur.fonction = SIN;
-                    else if (strcmp(buffer, "COS") == 0|(strcmp(buffer, "cos"))== 0)
+                    }
+                    else if (strcmp(buffer, "COS") == 0|(strcmp(buffer, "cos"))== 0){
+                        T[j].lexem = FONCTION;
                         T[j].valeur.fonction = COS;
-                    else if (strcmp(buffer, "TAN") == 0|(strcmp(buffer, "tan"))== 0)
+                    }
+                    else if (strcmp(buffer, "TAN") == 0|(strcmp(buffer, "tan"))== 0){
+                        T[j].lexem = FONCTION;
                         T[j].valeur.fonction = TAN;
-                    else if (strcmp(buffer, "EXP") == 0|(strcmp(buffer, "exp"))== 0)
+                    }
+                    else if (strcmp(buffer, "EXP") == 0|(strcmp(buffer, "exp"))== 0){
+                        T[j].lexem = FONCTION;
                         T[j].valeur.fonction = EXP;
+                    }
                     else {
                         T[j].lexem = ERREUR;
-                        T[j].valeur.erreur = erreur100;
+                        T[j].valeur.erreur = erreur101;
                     }
-                    
-                    T[j].lexem = FONCTION;
                     j++;
                     continue;
                 }
@@ -134,5 +149,5 @@ void AnalyseLex(typejeton T[], char str[]) {
         j++;
     }
 
-    T[j].lexem = FIN; // Marque la fin de l'analyse
+    T[j].lexem = FIN; 
 }

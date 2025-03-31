@@ -2,14 +2,13 @@
 #include <stdio.h>
 
 int main() {
-    typejeton T[50]; // Augmentation de la taille pour éviter les débordements
+    typejeton T[50]; 
 
     char expression[50];
     printf("Entrez une expression : ");
-    scanf("%49s", expression); // Empêche le dépassement de mémoire
+    scanf("%49s", expression);
 
     AnalyseLex(T, expression);
-    AfficherLexemes(T);
-
+    AfficherLexemes(T); //Affiche l'analyse lexicale
     return 0;
 }
