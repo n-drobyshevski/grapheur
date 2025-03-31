@@ -12,7 +12,7 @@ void RelancerProgramme() {
         scanf("%49s", expression);
         
         AnalyseLex(T, expression);
-        AfficherLexemes(T);
+        //AfficherLexemes(T);
         
         if (!ContientErreur(T)) {
             Node* arbre = analyserSyntaxe(T);
