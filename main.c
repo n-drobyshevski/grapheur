@@ -1,4 +1,6 @@
-#include "lexical.h"
+#include "./lexical/lexical.h"
+#include "./syntax/syntax.h"
+
 #include <stdio.h>
 
 int main() {
@@ -11,5 +13,10 @@ int main() {
     AnalyseLex(T, expression);
     AfficherLexemes(T);
 
+    Node* arbre = analyserSyntaxe(T);
+    printf("\nArbre syntaxique :\n");
+    afficherArbre(arbre, 0);
+    libererArbre(arbre);
+    
     return 0;
 }
