@@ -10,12 +10,12 @@ void RelancerProgramme() {
         scanf("%49s", expression);
         
         AnalyseLex(T, expression);
-        AfficherLexemes(T);
+        //AfficherLexemes(T);
         
         if (!ContientErreur(T)) {
             break;
         }
-        printf("Une erreur a ete detectee. Veuillez reessayer.\n");
+        printf("Veuillez reessayer.\n");
     }
 }
 
