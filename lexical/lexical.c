@@ -151,3 +151,15 @@ void AnalyseLex(typejeton T[], char str[]) {
 
     T[j].lexem = FIN; 
 }
+
+
+int ContientErreur(typejeton T[]) {
+    int i = 0;
+    while (T[i].lexem != FIN) {
+        if (T[i].lexem == ERREUR) {
+            return 1;
+        }
+        i++;
+    }
+    return 0;
+}

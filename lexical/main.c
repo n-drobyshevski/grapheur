@@ -1,14 +1,25 @@
 #include "lexical.h"
 #include <stdio.h>
 
-int main() {
+void RelancerProgramme() {
     typejeton T[50]; 
-
     char expression[50];
-    printf("Entrez une expression : ");
-    scanf("%49s", expression);
+    
+    while (1) {
+        printf("Entrez une expression : ");
+        scanf("%49s", expression);
+        
+        AnalyseLex(T, expression);
+        AfficherLexemes(T);
+        
+        if (!ContientErreur(T)) {
+            break;
+        }
+        printf("Une erreur a ete detectee. Veuillez reessayer.\n");
+    }
+}
 
-    AnalyseLex(T, expression);
-    AfficherLexemes(T); //Affiche l'analyse lexicale
+int main() {
+    RelancerProgramme();
     return 0;
 }
