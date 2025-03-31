@@ -1,3 +1,5 @@
+#ifndef JETON_H
+#define JETON_H
 typedef enum
 {
     REEL,OPERATEUR,FONCTION,ERREUR,FIN,PAR_OUV,PAR_FERM,VARIABLE,BAR_OUV,BAR_FERM,ABSOLU
@@ -39,3 +41,4 @@ typedef struct Node
     struct Node *pjeton_suiv;
 }Node;
 typedef Node *Arbre;
+#endif

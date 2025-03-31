@@ -1,8 +1,10 @@
-#ifndef LEXICAL
+#ifndef LEXICAL_H
+#define LEXICAL_H
 
-#define LEXICAL
 #include "jeton.h"
-int analyse_lex(typejeton T[], char str[]);
+#include <stdio.h>
 
+void AnalyseLex(typejeton T[], char str[]);
+void AfficherLexemes(typejeton T[]);
 
 #endif
