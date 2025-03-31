@@ -106,7 +106,7 @@ void afficherArbre(Node* racine, int profondeur) {
   } else if (racine->jeton.lexem == FONCTION) {
       switch (racine->jeton.valeur.fonction) {
           case SIN: printf("SIN\n"); break;
-          case COS: printf("COS\n"); break;s
+          case COS: printf("COS\n"); break;
           case TAN: printf("TAN\n"); break;
           case LOG: printf("LOG\n"); break;
           case SQRT: printf("SQRT\n"); break;
