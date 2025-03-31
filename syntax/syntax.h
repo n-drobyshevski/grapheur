@@ -2,15 +2,22 @@
 #define SYNTAX_H
 
 #include "../lexical/jeton.h"
-#include "../lexical/lexical.h"
+#include <stddef.h>
+/*------------------------------------------------
+ *           AST Node Definition
+ *-----------------------------------------------*/
+typedef struct Node {
+  int type; // use token type (e.g., REEL, OPERATEUR, etc.) from jeton.h
+  int value;
+  struct Node *left;
+  struct Node *right;
+} Node;
 
-// Définition des fonctions de l'analyseur syntaxique
-Node* creerNoeud(typejeton jeton);
-Node* analyserExpression(typejeton T[], int* index);
-Node* analyserFacteur(typejeton T[], int* index);
-Node* analyserTerme(typejeton T[], int* index);
-Node* analyserSyntaxe(typejeton T[]);
-void afficherArbre(Node* racine, int profondeur);
-void libererArbre(Node* racine);
-
-#endif // SYNTAX_H
+/*------------------------------------------------
+ *           Function Prototypes
+ *-----------------------------------------------*/
+void error(const char *message);
+Node *analyserSyntaxe(typejeton tokens[]);
+void afficherArbre(Node *root, int level);
+void libererArbre(Node *root);
+#endif

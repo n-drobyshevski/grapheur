@@ -1,126 +1,286 @@
-#include "../lexical/jeton.h"
-#include "../lexical/lexical.h"
-#include <stdlib.h>
+#include <ctype.h> // for isspace
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h> // for memcpy
 
-// Fonction pour créer un nouveau nœud
-Node* creerNoeud(typejeton jeton) {
-    Node* nouveau = (Node*)malloc(sizeof(Node));
-    if (!nouveau) {
-        printf("Erreur d'allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
-    nouveau->jeton = jeton;
-    nouveau->pjeton_preced = NULL;
-    nouveau->pjeton_suiv = NULL;
-    return nouveau;
+#include "../lexical/jeton.h"
+#include "syntax.h"
+
+/*------------------------------------------------
+ *              Global State
+ *-----------------------------------------------*/
+const char *input;
+static int currentIndex = 0;
+size_t pos;
+
+static typejeton tokens[256];
+static typejeton *currentTokens;
+
+/*------------------------------------------------
+ *                Error Handling
+ *-----------------------------------------------*/
+static void parseError(const char *message) {
+  fprintf(stderr, "syntax level Error: %s at token index %d\n", message,
+          currentIndex);
+  exit(EXIT_FAILURE);
 }
 
-// Fonction de parsing récursive pour analyser une expression
-Node* analyserExpression(typejeton T[], int* index);
-Node* analyserFacteur(typejeton T[], int* index);
-Node* analyserTerme(typejeton T[], int* index);
+static typejeton getCurrentToken() { return tokens[currentIndex]; }
 
-// Analyse un facteur (nombre, variable, parenthèses ou fonction)
-Node* analyserFacteur(typejeton T[], int* index) {
-    typejeton jeton = T[*index];
-    (*index)++;
-
-    if (jeton.lexem == REEL || jeton.lexem == VARIABLE) {
-        return creerNoeud(jeton);
-    }
-    else if (jeton.lexem == FONCTION) {
-        Node* noeud = creerNoeud(jeton);
-        noeud->pjeton_suiv = analyserFacteur(T, index);
-        return noeud;
-    }
-    else if (jeton.lexem == PAR_OUV) {
-        Node* noeud = analyserExpression(T, index);
-        if (T[*index].lexem == PAR_FERM) {
-            (*index)++;
-        } else {
-            printf("Erreur : Parenthèse non fermée\n");
-            exit(EXIT_FAILURE);
-        }
-        return noeud;
-    }
-    printf("Erreur de syntaxe\n");
-    exit(EXIT_FAILURE);
+static typejeton advanceToken() {
+  ++currentIndex;
+  //   printf("[LOG] Advanced to token lexem: %d\n",
+  //   tokens[currentIndex].lexem);
+  return tokens[currentIndex];
 }
 
-// Analyse un terme (multiplication et division ont priorité)
-Node* analyserTerme(typejeton T[], int* index) {
-    Node* noeud = analyserFacteur(T, index);
-    
-    while (T[*index].lexem == OPERATEUR && 
-           (T[*index].valeur.operateur == FOIS || T[*index].valeur.operateur == DIV)) {
-        typejeton op = T[*index];
-        (*index)++;
-        Node* nouveau = creerNoeud(op);
-        nouveau->pjeton_preced = noeud;
-        nouveau->pjeton_suiv = analyserFacteur(T, index);
-        noeud = nouveau;
-    }
-    return noeud;
+/*------------------------------------------------
+ *           Parser based on typejeton
+ *-----------------------------------------------*/
+static Node *expr(); // Forward
+
+static Node *create_node(typelexem type, int value, Node *left, Node *right) {
+  Node *node = (Node *)malloc(sizeof(Node));
+  // Map 'typelexem' to Node fields
+  node->type = type;
+  node->value = value;
+  node->left = left;
+  node->right = right;
+  return node;
 }
 
-// Analyse une expression complète
-Node* analyserExpression(typejeton T[], int* index) {
-    Node* noeud = analyserTerme(T, index);
-    
-    while (T[*index].lexem == OPERATEUR && 
-           (T[*index].valeur.operateur == PLUS || T[*index].valeur.operateur == MOINS)) {
-        typejeton op = T[*index];
-        (*index)++;
-        Node* nouveau = creerNoeud(op);
-        nouveau->pjeton_preced = noeud;
-        nouveau->pjeton_suiv = analyserTerme(T, index);
-        noeud = nouveau;
-    }
-    return noeud;
-}
-
-// Fonction principale d'analyse syntaxique
-Node* analyserSyntaxe(typejeton T[]) {
-    int index = 0;
-    return analyserExpression(T, &index);
-}
-
-// Fonction pour afficher l'arbre syntaxique
-void afficherArbre(Node* racine, int profondeur) {
-  if (racine == NULL) return;
-  afficherArbre(racine->pjeton_suiv, profondeur + 1);
-  for (int i = 0; i < profondeur; i++) printf("  ");
-  if (racine->jeton.lexem == REEL) {
-      printf("%f\n", racine->jeton.valeur.reel);
-  } else if (racine->jeton.lexem == VARIABLE) {
-      printf("x\n");
-  } else if (racine->jeton.lexem == OPERATEUR) {
-      switch (racine->jeton.valeur.operateur) {
-          case PLUS: printf("+\n"); break;
-          case MOINS: printf("-\n"); break;
-          case FOIS: printf("*\n"); break;
-          case DIV: printf("/\n"); break;
-          case PUIS: printf("^\n"); break;
+Node *factor() {
+  typejeton tk = getCurrentToken();
+  if (tk.lexem == REEL) {
+    Node *node = create_node(REEL, (int)tk.valeur.reel, NULL, NULL);
+    advanceToken();
+    return node;
+  } else if (tk.lexem == FONCTION) {
+    typefontion func = tk.valeur.fonction;
+    advanceToken(); // skip function token
+    Node *arg = NULL;
+    // Allow functions to either use parentheses: SIN(expr) or a bare argument:
+    // SIN expr
+    if (getCurrentToken().lexem == PAR_OUV) {
+      advanceToken(); // skip '('
+      arg = expr();
+      if (getCurrentToken().lexem != PAR_FERM) {
+        parseError("Missing closing parenthesis after function");
       }
-  } else if (racine->jeton.lexem == FONCTION) {
-      switch (racine->jeton.valeur.fonction) {
-          case SIN: printf("SIN\n"); break;
-          case COS: printf("COS\n"); break;
-          case TAN: printf("TAN\n"); break;
-          case LOG: printf("LOG\n"); break;
-          case SQRT: printf("SQRT\n"); break;
-          case EXP: printf("EXP\n"); break;
-          default: printf("f\n");
-      }
+      advanceToken(); // skip ')'
+    } else {
+      arg = factor();
+    }
+    return create_node(FONCTION, func, arg, NULL);
+  } else if (tk.lexem == PAR_OUV) {
+    advanceToken(); // skip '('
+    Node *node = expr();
+    if (getCurrentToken().lexem != PAR_FERM) {
+      parseError("Missing closing parenthesis");
+    }
+    advanceToken(); // skip ')'
+    return node;
+  } else {
+    parseError("Unexpected token in factor");
+    return NULL;
   }
-  afficherArbre(racine->pjeton_preced, profondeur + 1);
+}
+static Node *power() {
+  Node *node = factor();
+  // Handle exponentiation operator (PUIS)
+  if (getCurrentToken().lexem == OPERATEUR &&
+      getCurrentToken().valeur.operateur == PUIS) {
+    advanceToken();
+    // Using recursion ensures right-associativity.
+    Node *right = power();
+    node = create_node(OPERATEUR, PUIS, node, right);
+  }
+  return node;
 }
 
-// Fonction pour libérer l'arbre
-void libererArbre(Node* racine) {
-    if (!racine) return;
-    libererArbre(racine->pjeton_preced);
-    libererArbre(racine->pjeton_suiv);
-    free(racine);
+Node *term() {
+  // Change factor() to power() so that exponentiation is parsed correctly.
+  Node *node = power();
+  while (1) {
+    typejeton tk = getCurrentToken();
+    if (tk.lexem == OPERATEUR &&
+        (tk.valeur.operateur == FOIS || tk.valeur.operateur == DIV)) {
+      typeoperateur op = tk.valeur.operateur;
+      advanceToken();
+      Node *right = power();
+      node = create_node(OPERATEUR, op, node, right);
+    } else {
+      break;
+    }
+  }
+  return node;
 }
+
+static Node *expr() {
+  //   printf("[LOG] Entering expr() at token index %d\n", currentIndex);
+  Node *node = term();
+  while (1) {
+    typejeton tk = getCurrentToken();
+    // printf("[LOG] Current token: lexem=%d, valeur=%d\n", tk.lexem,
+    //    tk.valeur.operateur);
+    if (tk.lexem == OPERATEUR &&
+        (tk.valeur.operateur == PLUS || tk.valeur.operateur == MOINS)) {
+      //   printf("[LOG] Found operator (%d) in expr() at token index %d\n",
+      //  tk.valeur.operateur, currentIndex);
+      typeoperateur op = tk.valeur.operateur;
+      advanceToken();
+      Node *right = term();
+      node = create_node(OPERATEUR, op, node, right);
+      //   printf("[LOG] Created operator node (%d) at token index %d\n", op,
+      //  currentIndex);
+    } else {
+      break;
+    }
+  }
+  //   printf("[LOG] Exiting expr() at token index %d\n", currentIndex);
+  return node;
+}
+
+/*------------------------------------------------
+ *      Helper function to convert enum to string
+ *-----------------------------------------------*/
+static const char *token_type_to_str(typelexem t) {
+  switch (t) {
+  case REEL:
+    return "REEL";
+  case OPERATEUR:
+    return "OPERATEUR";
+  case FONCTION:
+    return "FONCTION";
+  case ERREUR:
+    return "ERREUR";
+  case FIN:
+    return "FIN";
+  case PAR_OUV:
+    return "PAR_OUV";
+  case PAR_FERM:
+    return "PAR_FERM";
+  case VARIABLE:
+    return "VARIABLE";
+  default:
+    return "UNKNOWN_TOKEN";
+  }
+}
+// Print the AST sideways
+void print_ast(Node *root, int level, char branch) {
+  if (!root)
+    return;
+
+  // Print the right subtree, marking it with '/'
+  print_ast(root->right, level + 1, '/');
+
+  for (int i = 0; i < level; i++) {
+    printf("    ");
+  }
+
+  // Print the branch marker ( ' ' for root, '/' or '\' for subtrees )
+  printf("%c--(", branch);
+  if (root->type == OPERATEUR) {
+    // Print the operator symbol using tk.valeur.operateur
+    const char *op_str;
+    switch (root->value) {
+    case PLUS:
+      op_str = "+";
+      break;
+    case MOINS:
+      op_str = "-";
+      break;
+    case FOIS:
+      op_str = "*";
+      break;
+    case DIV:
+      op_str = "/";
+      break;
+    case PUIS:
+      op_str = "^";
+      break;
+    default:
+      op_str = "UNKNOWN";
+      break;
+    }
+    printf("OPERATEUR:%s", op_str);
+  } else if (root->type == FONCTION) {
+    // Print the function name based on function code in root->value
+    const char *func_str;
+    switch (root->value) {
+    case ABS:
+      func_str = "ABS";
+      break;
+    case SIN:
+      func_str = "SIN";
+      break;
+    case SQRT:
+      func_str = "SQRT";
+      break;
+    case LOG:
+      func_str = "LOG";
+      break;
+    case COS:
+      func_str = "COS";
+      break;
+    case TAN:
+      func_str = "TAN";
+      break;
+    case EXP:
+      func_str = "EXP";
+      break;
+    case ENTIER:
+      func_str = "ENTIER";
+      break;
+    case VAL_NEG:
+      func_str = "VAL_NEG";
+      break;
+    case SINC:
+      func_str = "SINC";
+      break;
+    default:
+      func_str = "UNKNOWN";
+      break;
+    }
+    printf("FONCTION:%s", func_str);
+  } else {
+    printf("%s", token_type_to_str(root->type));
+    if (root->type == REEL) {
+      printf(":%d", root->value);
+    }
+  }
+  printf(")\n");
+
+  // Print the left subtree, marking it with '\'
+  print_ast(root->left, level + 1, '\\');
+}
+
+/*------------------------------------------------
+ *          AST Memory Cleanup
+ *-----------------------------------------------*/
+static void free_ast(Node *root) {
+  if (!root)
+    return;
+  free_ast(root->left);
+  free_ast(root->right);
+  free(root);
+}
+
+/*------------------------------------------------
+ *      Public API for syntax parsing & AST management
+ *-----------------------------------------------*/
+Node *analyserSyntaxe(typejeton tokens_array[]) {
+
+  memcpy(tokens, tokens_array, sizeof(tokens));
+  currentIndex = 0;
+  Node *root = expr();
+  if (tokens[currentIndex].lexem != FIN) {
+    parseError("Extra characters after valid expression");
+  }
+  printf("\nSyntax OK - AST built.\n");
+  return root;
+}
+
+void afficherArbre(Node *root, int level) { print_ast(root, level, ' '); }
+
+void libererArbre(Node *root) { free_ast(root); }

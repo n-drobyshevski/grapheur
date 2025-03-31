@@ -34,11 +34,11 @@ typelexem lexem;
 typevaleur valeur;
 }typejeton;
 
-typedef struct Node
-{
-    typejeton jeton;
-    struct Node *pjeton_preced;
-    struct Node *pjeton_suiv;
-}Node;
-typedef Node *Arbre;
+// typedef struct Node
+// {
+//     typejeton jeton;
+//     struct Node *pjeton_preced;
+//     struct Node *pjeton_suiv;
+// }Node;
+// typedef Node *Arbre;
 #endif 
