@@ -33,7 +33,7 @@ void AfficherLexemes(typejeton T[]) {
                     case LOG: printf("(LOG)\n"); break;
                     case SQRT: printf("(SQRT)\n"); break;
                     case EXP: printf("(EXP)\n"); break;
-                    default: printf("(Inconnue)\n");
+                    case ABS: printf("(ABS)\n"); break;
                 }
                 break;
             case PAR_OUV:
@@ -133,6 +133,18 @@ void AnalyseLex(typejeton T[], char str[]) {
                     else if (strcmp(buffer, "EXP") == 0|(strcmp(buffer, "exp"))== 0){
                         T[j].lexem = FONCTION;
                         T[j].valeur.fonction = EXP;
+                    }
+                    else if (strcmp(buffer, "LOG") == 0|(strcmp(buffer, "log"))== 0){
+                        T[j].lexem = FONCTION;
+                        T[j].valeur.fonction = LOG;
+                    }
+                    else if (strcmp(buffer, "SQRT") == 0|(strcmp(buffer, "sqrt"))== 0){
+                        T[j].lexem = FONCTION;
+                        T[j].valeur.fonction = SQRT;
+                    }
+                    else if (strcmp(buffer, "ABS") == 0|(strcmp(buffer, "abs"))== 0){
+                        T[j].lexem = FONCTION;
+                        T[j].valeur.fonction = ABS;
                     }
                     else {
                         T[j].lexem = ERREUR;
