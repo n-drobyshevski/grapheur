@@ -163,24 +163,3 @@ void AnalyseLex(typejeton T[], char str[]) {
 
     T[j].lexem = FIN; 
 }
-
-
-int ContientErreur(typejeton T[]) {
-    int i = 0;
-    while (T[i].lexem != FIN) {
-        if (T[i].lexem == ERREUR) {
-            switch (T[i].valeur.erreur) {
-                case 0:
-                printf("Caractere inconnu\n");
-                break;
-
-                case 1:
-                printf("Fonction inconnue\n");
-                break;
-            }
-            return 1;
-        }
-        i++;
-    }
-    return 0;
-}

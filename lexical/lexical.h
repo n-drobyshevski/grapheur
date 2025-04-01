@@ -6,6 +6,5 @@
 
 void AnalyseLex(typejeton T[], char str[]);
 void AfficherLexemes(typejeton T[]);
-int ContientErreur(typejeton T[]);
 
 #endif
