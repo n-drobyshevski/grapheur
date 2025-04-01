@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 void RelancerProgramme() {
-  typejeton T[50];
-  char expression[50];
+  typejeton T[256];
+  char expression[100];
 
   while (1) {
     printf("Entrez une expression : ");
@@ -17,11 +17,15 @@ void RelancerProgramme() {
     if (!ContientErreur(T)) {
       printf("Buildn' ast...");
       Node *arbre = analyserSyntaxe(T);
-      printf("\nExpression: %s", expression);
-      printf("\nArbre syntaxique :\n");
-      afficherArbre(arbre, 0);
-      libererArbre(arbre);
-      break;
+      if (arbre == NULL) {
+        printf("Partial or invalid expression. Syntax error.\n");
+      } else {
+        printf("\nExpression: %s", expression);
+        printf("\nArbre syntaxique :\n");
+        afficherArbre(arbre, 0);
+        libererArbre(arbre);
+        break;
+      }
     }
     printf("Veuillez reessayer.\n");
   }

@@ -15,6 +15,7 @@ size_t pos;
 
 static typejeton tokens[256];
 static typejeton *currentTokens;
+static int parseHasError = 0;
 
 /*------------------------------------------------
  *                Error Handling
@@ -22,7 +23,7 @@ static typejeton *currentTokens;
 static void parseError(const char *message) {
   fprintf(stderr, "syntax level Error: %s at token index %d\n", message,
           currentIndex);
-  exit(EXIT_FAILURE);
+  parseHasError = 1;
 }
 
 static typejeton getCurrentToken() { return tokens[currentIndex]; }
@@ -270,14 +271,20 @@ static void free_ast(Node *root) {
  *      Public API for syntax parsing & AST management
  *-----------------------------------------------*/
 Node *analyserSyntaxe(typejeton tokens_array[]) {
+  parseHasError = 0;
 
   memcpy(tokens, tokens_array, sizeof(tokens));
   currentIndex = 0;
   Node *root = expr();
+  if (parseHasError) {
+    fprintf(stderr, "Recoverable syntax error encountered.\n");
+    return NULL;
+  }
   if (tokens[currentIndex].lexem != FIN) {
     parseError("Extra characters after valid expression");
   }
   printf("\nSyntax OK - AST built.\n");
+  fflush(stdout);
   return root;
 }
 
