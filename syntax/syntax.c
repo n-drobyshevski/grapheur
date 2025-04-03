@@ -40,7 +40,7 @@ static typejeton advanceToken() {
  *-----------------------------------------------*/
 static Node *expr(); // Forward
 
-static Node *create_node(typelexem type, int value, Node *left, Node *right) {
+static Node *create_node(typelexem type, float value, Node *left, Node *right) {
   Node *node = (Node *)malloc(sizeof(Node));
   // Map 'typelexem' to Node fields
   node->type = type;
@@ -53,15 +53,14 @@ static Node *create_node(typelexem type, int value, Node *left, Node *right) {
 Node *factor() {
   typejeton tk = getCurrentToken();
   if (tk.lexem == REEL) {
-    Node *node = create_node(REEL, (int)tk.valeur.reel, NULL, NULL);
+    Node *node = create_node(REEL, tk.valeur.reel, NULL, NULL);
     advanceToken();
     return node;
   } else if (tk.lexem == FONCTION) {
     typefontion func = tk.valeur.fonction;
     advanceToken(); // skip function token
     Node *arg = NULL;
-    // Allow functions to either use parentheses: SIN(expr) or a bare argument:
-    // SIN expr
+    // Allow functions to either use parentheses
     if (getCurrentToken().lexem == PAR_OUV) {
       advanceToken(); // skip '('
       arg = expr();
@@ -184,7 +183,7 @@ void print_ast(Node *root, int level, char branch) {
   if (root->type == OPERATEUR) {
     // Print the operator symbol using tk.valeur.operateur
     const char *op_str;
-    switch (root->value) {
+    switch ((int)root->value) {
     case PLUS:
       op_str = "+";
       break;
@@ -208,7 +207,7 @@ void print_ast(Node *root, int level, char branch) {
   } else if (root->type == FONCTION) {
     // Print the function name based on function code in root->value
     const char *func_str;
-    switch (root->value) {
+    switch ((int)root->value) {
     case ABS:
       func_str = "ABS";
       break;
@@ -247,7 +246,7 @@ void print_ast(Node *root, int level, char branch) {
   } else {
     printf("%s", token_type_to_str(root->type));
     if (root->type == REEL) {
-      printf(":%d", root->value);
+      printf(":%f", root->value);
     }
   }
   printf(")\n");

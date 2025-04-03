@@ -8,7 +8,7 @@
  *-----------------------------------------------*/
 typedef struct Node {
   int type; // use token type (e.g., REEL, OPERATEUR, etc.) from jeton.h
-  int value;
+  float value;
   struct Node *left;
   struct Node *right;
 } Node;
