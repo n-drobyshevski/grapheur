@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "lexical.h": "c"
+        "lexical.h": "c",
+        "string.h": "c"
     }
 }
