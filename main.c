@@ -1,6 +1,7 @@
 #include "./graphics/gestionGraphique.h"
 #include "./lexical/lexical.h"
 #include "./syntax/syntax.h"
+#include "./evaluation/evaluateur.h"
 
 
 #include <stdio.h>
@@ -86,6 +87,13 @@ void RelancerProgramme() {
                                 printf("\nExpression: %s", entry_f);
                                 printf("\nArbre syntaxique :\n");
                                 afficherArbre(arbre, 0);
+
+                                printf("\nValeurs de f(x) :\n");
+                                for (double x = -10.0; x <= 10.0; x += 0.5) {
+                                    double y = evaluate_expression(arbre, x);
+                                    printf("f(%.1f) = %.4f\n", x, y);
+                                }
+                                
                                 libererArbre(arbre);
                                 break;
                             }
@@ -142,5 +150,3 @@ int ContientErreur(typejeton T[],SDL_Renderer *ren,SDL_Color red,TTF_Font *font2
     }
     return 0;
 }
-
-

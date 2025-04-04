@@ -95,7 +95,6 @@ void clearRenderer(SDL_Renderer *ren){
 	SDL_RenderClear(ren);
 }
 
-#include <SDL2/SDL.h>
 
 char processKeyboard(){
     char pdirection = ' ';

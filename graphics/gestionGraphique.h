@@ -2,8 +2,8 @@
 #define GESTIONGRAPHIQUE_H_
 
 #include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "../include/SDL2/SDL.h"
+#include "../include/SDL2/SDL_ttf.h"
 
 /**
 * Initialise la SDL
