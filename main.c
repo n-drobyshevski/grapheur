@@ -42,7 +42,7 @@ void RelancerProgramme() {
 
     initSDL();
     initTTF();
-    SDL_Window *win = createWindow("Grapheur", 1100, 700);
+    SDL_Window *win = createWindow("Grapheur", 1100, 600);
     SDL_Renderer *ren = createRenderer(win);
     SDL_Texture *background = loadTexture("./graphics/graphimt1.bmp", ren);
     TTF_Font *font2 = createFont("./graphics/DejaVuSans.ttf", 30);

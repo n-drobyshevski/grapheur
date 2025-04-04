@@ -65,5 +65,14 @@ int main(void) {
     };
     run_test("Error case - (3 + 4", test5);
 
+    // Test 6: x + 3.0
+    typejeton testx[200] = {
+        { VARIABLE, { 0 } },
+        { OPERATEUR, { .operateur = PLUS } },
+        { REEL, { .reel = 3.0 } },
+        { FIN, { 0 } }
+    };
+    run_test("x + 3.0", testx);
+
     return EXIT_SUCCESS;
 }

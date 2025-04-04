@@ -80,6 +80,10 @@ Node *factor() {
     }
     advanceToken(); // skip ')'
     return node;
+  } else if (tk.lexem == VARIABLE) {
+    Node *node = create_node(VARIABLE, 0.0, NULL, NULL);
+    advanceToken();
+    return node;
   } else {
     parseError("Unexpected token in factor");
     return NULL;
