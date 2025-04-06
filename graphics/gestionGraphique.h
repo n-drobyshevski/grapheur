@@ -1,9 +1,12 @@
 #ifndef GESTIONGRAPHIQUE_H_
 #define GESTIONGRAPHIQUE_H_
 
+#include <math.h>
 #include <stdio.h>
-#include "../include/SDL2/SDL.h"
-#include "../include/SDL2/SDL_ttf.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <ctype.h>
+#include <string.h>
 
 /**
 * Initialise la SDL
