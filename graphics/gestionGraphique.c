@@ -252,4 +252,3 @@ void QuitSDL(SDL_Window *win, SDL_Renderer *ren){
 	SDL_DestroyRenderer(ren);
 	SDL_Quit(); 
 }
-
